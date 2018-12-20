@@ -1,0 +1,50 @@
+####### GA packages ########
+library("googleAuthR", lib.loc="~/R/R-3.4.2/library")
+library("googleAnalyticsR", lib.loc="~/R/R-3.4.2/library")
+library("dplyr", lib.loc="~/R/R-3.4.2/library")
+library(lubridate)
+ga_auth()
+view_id <- XXXXXXXXXX
+
+#last week date classification
+# - TY
+x <- Sys.Date()-7
+SOW <- floor_date(as.Date(x, "%m/%d/%Y"), unit="week")
+EOW <- as.Date(SOW)+6
+
+## pulling in order data ##
+
+x <- Sys.Date()-7
+SOW <- floor_date(as.Date(x, "%m/%d/%Y"), unit="week")
+EOW <- as.Date(SOW)+6
+
+ClassSess <- google_analytics(view_id,
+                              date_range = c(SOW,EOW),
+                              dimensions = c("date","transactionID", "source","sourceMedium", "campaign"),
+                              metrics = c("transactionRevenue"),
+                              anti_sample = TRUE)
+
+ClassSess$classifed <-  ifelse(grepl('facebook / paidsocial', ClassSess$sourceMedium) & !grepl('remark', ClassSess$campaign), 'Social - paid fb', 
+                               ifelse(grepl('paidsocial', ClassSess$sourceMedium) & grepl('remarket', ClassSess$campaign) & !grepl('retail', ClassSess$campaign), 'facebook remarketing',      
+                                      ifelse(grepl('dn', ClassSess$campaign) & grepl('rm', ClassSess$campaign) & grepl('cpc', ClassSess$sourceMedium) |grepl('- gsp', ClassSess$campaign), 'GDN remarketing',  
+                                             ifelse(ClassSess$sourceMedium == 'email / newsletter','Email - traditional',
+                                                    ifelse(ClassSess$sourceMedium == 'bluecore / email'| ClassSess$sourceMedium == 'email / welcome','Email - triggered',
+                                                           ifelse(grepl('lp - shop', ClassSess$campaign) | grepl('shopping', ClassSess$campaign) ,'Search - shopping',  
+                                                                  ifelse(grepl('nontm', ClassSess$campaign),'search - non-brand',
+                                                                         ifelse(grepl('lp - tm', ClassSess$campaign),'Search - brand',
+                                                                                ifelse(grepl('impactradius', ClassSess$source),'Affiliate',
+                                                                                       ifelse(grepl('instagram / paid', ClassSess$sourceMedium),'social - paid instagram',
+                                                                                              ifelse(grepl('facebook.com / ref', ClassSess$sourceMedium)|grepl('gram.com / ref',ClassSess$sourceMedium)|
+                                                                                                       grepl('pinterest.com / ref',ClassSess$sourceMedium)|grepl('/ social', ClassSess$sourceMedium), 'social - organic','other')))))))))))
+
+
+
+
+
+
+
+
+
+
+
+
