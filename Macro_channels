@@ -1,0 +1,18 @@
+Session_data <- google_analytics(view_id,
+                                 date_range = c('2019-09-07','2019-10-24'),
+                                 dimensions = c("date","source","sourceMedium", "campaign"),
+                                 metrics = c("sessions"),
+                                 anti_sample = TRUE)
+
+Session_data$Macro <-  ifelse(grepl('impact', Session_data$sourceMedium),'Affiliates',
+                              ifelse(grepl('(direct)',Session_data$sourceMedium), 'direct',
+                                     ifelse(grepl('email',Session_data$sourceMedium), 'Email',
+                                            ifelse(grepl('- dy -', Session_data$campaign) & grepl('- gsp -', Session_data$campaign) | grepl('- dn -', Session_data$sourceMedium) |grepl('gsp', Session_data$campaign)|grepl('criteo', Session_data$sourceMedium), 'display',  
+                                                   ifelse(grepl('organic', Session_data$sourceMedium),'Search - Organic',
+                                                          ifelse(grepl('cpc', Session_data$sourceMedium) ,'search - Paid',  
+                                                                 ifelse(grepl('tm / (not set))', Session_data$sourceMedium)|grepl('fb / (notset)', Session_data$sourceMedium)|grepl('paidsocial', Session_data$sourceMedium) ,'Social - Paid', 
+                                                                        ifelse(grepl('facebook.com / ref', Session_data$sourceMedium)|grepl('gram.com / ref',Session_data$sourceMedium)|grepl('social',Session_data$sourceMedium)|
+                                                                                 grepl('pinterest.com / ref',Session_data$sourceMedium)|grepl('/ social', Session_data$sourceMedium), 'social - organic',
+                                                                               ifelse(grepl('referral', Session_data$sourceMedium) ,'Referral', 'other')))))))))
+
+
